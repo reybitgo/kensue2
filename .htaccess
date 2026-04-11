@@ -1,0 +1,41 @@
+Options -Indexes
+Options -MultiViews
+
+# Block direct access to PHP files except index.php and pass_hash.php
+<FilesMatch "\.php$">
+  Order Deny,Allow
+  Deny from all
+</FilesMatch>
+
+<Files "index.php">
+  Order Allow,Deny
+  Allow from all
+</Files>
+
+<Files "pass_hash.php">
+  Order Allow,Deny
+  Allow from all
+</Files>
+
+# Route everything through index.php
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /kensue2/
+
+  # Allow direct access to real files and directories (assets, uploads)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Block direct access to sensitive directories
+<IfModule mod_rewrite.c>
+  RewriteRule ^(config|core|models|controllers|cron|logs)/ - [F,L]
+</IfModule>
