@@ -115,12 +115,11 @@ class Commission
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  UNILEVEL GENERATIONAL REFERRAL BONUSES (10 levels deep)
-    //  Now pays in true generational style:
-    //    Level 1 = Direct sponsor of the new member
-    //    Level 2 = Sponsor of Level 1
-    //    Level 3 = Sponsor of Level 2 ... and so on
-    //  Uses the sponsor chain (with binary_parent fallback for root users)
+    //  UNILEVEL GENERATIONAL REFERRAL BONUSES 
+    //  Pure Sponsor Chain - No Binary Tree involvement at all
+    //  Level 1 = Direct sponsor of the new member
+    //  Level 2 = Sponsor of Level 1
+    //  Level 3 = Sponsor of Level 2 ... up to 10 levels
     // ══════════════════════════════════════════════════════════════════════════
 
     public static function processIndirectReferral(
@@ -128,24 +127,18 @@ class Commission
         int $newUserId,
         int $packageId
     ): void {
-        $levels = Package::getIndirectLevels($packageId);   // array [1 => 300.00, 2 => 200.00, ...]
+        $levels = Package::getIndirectLevels($packageId);
         if (empty($levels)) return;
 
         $pdo = db();
         $cur = $directSponsorId;
-        $visited = [$directSponsorId => true]; // prevent rare loops
+        $visited = [$directSponsorId => true];
 
         for ($lvl = 1; $lvl <= 10; $lvl++) {
 
-            // Get bonus for this generation level
             $bonus = (float)($levels[$lvl] ?? 0);
-            if ($bonus <= 0) {
-                // Still continue walking if higher levels might have bonus (optional)
-                // or break; if you want to stop at first zero
-            }
 
             if ($bonus > 0) {
-                // Insert commission record
                 $pdo->prepare("
                     INSERT INTO commissions
                       (user_id, type, amount, source_user_id, level, description, status)
@@ -155,30 +148,34 @@ class Commission
                     $bonus,
                     $newUserId,
                     $lvl,
-                    "Unilevel Generation {$lvl} bonus"
+                    "Unilevel Level {$lvl} Bonus"
                 ]);
 
                 $commId = (int)$pdo->lastInsertId();
 
-                // Credit to e-wallet
-                Ewallet::credit($cur, $bonus, $commId, 'commission', "Unilevel Generation {$lvl} — ₱" . number_format($bonus, 2));
+                Ewallet::credit(
+                    $cur,
+                    $bonus,
+                    $commId,
+                    'commission',
+                    "Unilevel Level {$lvl} Bonus"
+                );
             }
 
-            // Move up to the next upline (sponsor first, then binary fallback)
-            $row = $pdo->prepare(
-                'SELECT sponsor_id, binary_parent_id FROM users WHERE id = ?'
-            );
+            // Move up using ONLY sponsor_id
+            $row = $pdo->prepare('SELECT sponsor_id FROM users WHERE id = ?');
             $row->execute([$cur]);
             $upRow = $row->fetch();
 
-            if (!$upRow) break;
-
-            $next = (int)($upRow['sponsor_id'] ?? 0);
-            if (!$next) {
-                $next = (int)($upRow['binary_parent_id'] ?? 0);
+            if (!$upRow || empty($upRow['sponsor_id'])) {
+                break;
             }
 
-            if (!$next || isset($visited[$next])) break;
+            $next = (int)$upRow['sponsor_id'];
+
+            if (isset($visited[$next])) {
+                break;
+            }
 
             $visited[$next] = true;
             $cur = $next;
