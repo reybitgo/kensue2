@@ -41,9 +41,9 @@ $routes = [
     'do_login'           => ['AuthController',   'doLogin',         'guest'],
     'register'           => ['AuthController',   'showRegister',    'any'],
     'do_register'        => ['AuthController',   'doRegister',      'any'],
-    'validate_code'      => ['AuthController',   'ajaxValidateCode','guest'],
-    'check_username'     => ['AuthController',   'ajaxCheckUser',   'guest'],
-    'check_upline'       => ['AuthController',   'ajaxCheckUpline', 'guest'],
+    'validate_code'      => ['AuthController',   'ajaxValidateCode','any'],
+    'check_username'     => ['AuthController',   'ajaxCheckUser',   'any'],
+    'check_upline'       => ['AuthController',   'ajaxCheckUpline', 'any'],
     'logout'             => ['AuthController',   'logout',          'any'],
 
     // ── Member ────────────────────────────────────────
