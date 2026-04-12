@@ -20,7 +20,7 @@
         </div>
       </div>
       <div id="treeContainer" style="overflow:auto;background:#f4f6fb;min-height:360px;position:relative;cursor:grab;">
-        <div id="treeLoading" class="d-flex align-items-center justify-content-center py-5 text-muted gap-2">
+        <div id="treeLoading" style="display:flex;align-items:center;justify-content:center;padding:3rem 1rem;color:#6b7a99;gap:.5rem;font-size:.9rem;">
           <div class="spinner-border spinner-border-sm text-primary"></div> Loading tree…
         </div>
         <canvas id="treeCanvas" style="display:none;"></canvas>
@@ -84,13 +84,28 @@ let treeData=null, scale=1, offsetX=0, offsetY=0, nodeMap=[];
 const NODE_R=26, V_GAP=90, COLORS={active:'#12a05c',suspended:'#e03434'};
 
 async function loadTree() {
+  const loader = document.getElementById('treeLoading');
   try {
     const res = await fetch(API_URL + '&depth=4');
-    treeData  = await res.json();
-    document.getElementById('treeLoading').style.display = 'none';
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    treeData = await res.json();
+    loader.style.display = 'none';
     canvas.style.display = 'block';
     drawTree();
-  } catch(e) { document.getElementById('treeLoading').innerHTML = '⚠ Failed to load tree.'; }
+  } catch(e) {
+    loader.style.display = 'none';
+    canvas.style.display  = 'block';
+    // Show error overlay on canvas
+    const cw = Math.max(container.clientWidth, 400);
+    canvas.width  = cw;
+    canvas.height = 160;
+    ctx.clearRect(0, 0, cw, 160);
+    ctx.fillStyle = '#6b7a99';
+    ctx.font      = '14px Plus Jakarta Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⚠ Could not load tree. ' + (e.message || ''), cw / 2, 80);
+  }
 }
 
 function calcLayout(node, x, y, spread) {

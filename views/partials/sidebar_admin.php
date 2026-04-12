@@ -34,6 +34,9 @@ function renderAdminNav($cp, $user, $initial, $pendingPayouts, $pendingMembers) 
     <a href="<?= APP_URL ?>/?page=admin_codes" class="nav-item-link <?= $cp==='admin_codes'?'active':'' ?>">
       <span class="nav-icon">🎟️</span> Reg Codes
     </a>
+    <a href="<?= APP_URL ?>/?page=register" class="nav-item-link <?= $cp==='register'?'active':'' ?>">
+      <span class="nav-icon">➕</span> Register Member
+    </a>
 
     <div class="nav-section-label">Finance</div>
     <a href="<?= APP_URL ?>/?page=admin_payouts" class="nav-item-link <?= $cp==='admin_payouts'?'active':'' ?>">

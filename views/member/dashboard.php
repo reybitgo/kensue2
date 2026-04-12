@@ -15,6 +15,8 @@
         <p class="text-muted mb-0" style="font-size:.8rem;"><?= e($user['package_name'] ?? 'Member') ?> · Joined <?= fmt_date($user['joined_at']) ?></p>
       </div>
       <a href="<?= APP_URL ?>/?page=payout" class="btn btn-primary btn-sm">💳 Request Payout</a>
+      <a href="<?= APP_URL ?>/?page=register&sponsor=<?= urlencode($user['username']) ?>"
+         class="btn btn-success btn-sm">➕ Register Member</a>
     </div>
 
     <!-- KPI Cards -->

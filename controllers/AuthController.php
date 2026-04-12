@@ -44,6 +44,8 @@ class AuthController
 
     public function showRegister(): void
     {
+        // Pass pre-filled sponsor from ?sponsor= param
+        $prefillSponsor = trim($_GET['sponsor'] ?? '');
         require 'views/auth/register.php';
     }
 
@@ -113,6 +115,10 @@ class AuthController
         }
 
         // Register
+        $wasLoggedIn   = Auth::check();
+        $prevUserId    = Auth::id();
+        $prevUserRole  = $_SESSION['user_role'] ?? '';
+
         try {
             $newId = User::register([
                 'username'         => $username,
@@ -124,14 +130,24 @@ class AuthController
                 'binary_position'  => $position,
             ]);
 
-            $newUser = User::find($newId);
-            Auth::login($newUser);
-            flash('success', 'Welcome! Your account has been created successfully.');
-            redirect('/?page=dashboard');
+            if ($wasLoggedIn) {
+                // Registrant was already logged in (admin or member registering someone)
+                // Restore their session — do NOT switch to the new member
+                $_SESSION['user_id']   = $prevUserId;
+                $_SESSION['user_role'] = $prevUserRole;
+                flash('success', "Account @{$username} registered successfully.");
+                redirect($prevUserRole === 'admin' ? '/?page=admin_users' : '/?page=dashboard');
+            } else {
+                // New visitor registering themselves — log them in
+                $newUser = User::find($newId);
+                Auth::login($newUser);
+                flash('success', 'Welcome! Your account has been created successfully.');
+                redirect('/?page=dashboard');
+            }
 
         } catch (\Exception $e) {
             flash('error', $e->getMessage());
-            redirect('/?page=register');
+            redirect('/?page=register' . ($wasLoggedIn ? '&sponsor=' . urlencode($sponsorU) : ''));
         }
     }
 

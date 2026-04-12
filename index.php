@@ -39,8 +39,8 @@ $routes = [
     // ── Auth ──────────────────────────────────────────
     'login'              => ['AuthController',   'showLogin',       'guest'],
     'do_login'           => ['AuthController',   'doLogin',         'guest'],
-    'register'           => ['AuthController',   'showRegister',    'guest'],
-    'do_register'        => ['AuthController',   'doRegister',      'guest'],
+    'register'           => ['AuthController',   'showRegister',    'any'],
+    'do_register'        => ['AuthController',   'doRegister',      'any'],
     'validate_code'      => ['AuthController',   'ajaxValidateCode','guest'],
     'check_username'     => ['AuthController',   'ajaxCheckUser',   'guest'],
     'check_upline'       => ['AuthController',   'ajaxCheckUpline', 'guest'],
@@ -87,7 +87,8 @@ if (!$route) {
 [$ctrlClass, $method, $role] = $route;
 
 // Auth guards
-if ($role === 'guest' && Auth::check()) {
+// 'guest' pages redirect logged-in users away EXCEPT register (members can register new members)
+if ($role === 'guest' && Auth::check() && !in_array($page, ['register', 'do_register'])) {
     redirect(Auth::isAdmin() ? '/?page=admin' : '/?page=dashboard');
 }
 if ($role === 'member' && !Auth::check()) {

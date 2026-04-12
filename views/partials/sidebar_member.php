@@ -13,6 +13,7 @@ $nav = [
   ['page' => 'genealogy&view=binary',  'icon' => '🌳', 'label' => 'Binary Tree',      'pages' => ['genealogy'], 'view' => 'binary'],
   ['page' => 'genealogy&view=referral','icon' => '👥', 'label' => 'Referral Network', 'pages' => ['genealogy'], 'view' => 'referral'],
   'SEPARATOR:Account',
+  ['page' => 'register&sponsor='.$user['username'], 'icon' => '➕', 'label' => 'Register Member', 'pages' => ['register']],
   ['page' => 'payout',  'icon' => '💳', 'label' => 'Payouts',   'pages' => ['payout']],
   ['page' => 'profile', 'icon' => '⚙️', 'label' => 'Profile & Settings', 'pages' => ['profile']],
 ];
