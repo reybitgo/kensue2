@@ -31,8 +31,9 @@ class Commission
                        u.pairs_paid, u.pairs_flushed, u.pairs_paid_today,
                        p.pairing_bonus, p.daily_pair_cap
                 FROM   users u
-                JOIN   packages p ON p.id = u.package_id
-                WHERE  u.id = ? AND u.role = 'member' AND u.status = 'active'
+                LEFT JOIN packages p ON p.id = u.package_id
+                WHERE  u.id = ? AND u.status = 'active'
+                  AND  p.pairing_bonus IS NOT NULL
             ");
             $st->execute([$cur]);
             $ancestor = $st->fetch();
@@ -114,8 +115,12 @@ class Commission
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  INDIRECT REFERRAL BONUSES (10 levels up the SPONSOR chain)
-    //  Fires immediately to each qualifying upline sponsor.
+    //  UNILEVEL GENERATIONAL REFERRAL BONUSES (10 levels deep)
+    //  Now pays in true generational style:
+    //    Level 1 = Direct sponsor of the new member
+    //    Level 2 = Sponsor of Level 1
+    //    Level 3 = Sponsor of Level 2 ... and so on
+    //  Uses the sponsor chain (with binary_parent fallback for root users)
     // ══════════════════════════════════════════════════════════════════════════
 
     public static function processIndirectReferral(
@@ -123,31 +128,60 @@ class Commission
         int $newUserId,
         int $packageId
     ): void {
-        $levels = Package::getIndirectLevels($packageId); // [1 => 300.00, 2 => 200.00, ...]
-        $cur    = $directSponsorId;
+        $levels = Package::getIndirectLevels($packageId);   // array [1 => 300.00, 2 => 200.00, ...]
+        if (empty($levels)) return;
+
+        $pdo = db();
+        $cur = $directSponsorId;
+        $visited = [$directSponsorId => true]; // prevent rare loops
 
         for ($lvl = 1; $lvl <= 10; $lvl++) {
-            // Walk up sponsor chain
-            $row = db()->prepare('SELECT sponsor_id FROM users WHERE id = ?');
-            $row->execute([$cur]);
-            $cur = (int)$row->fetchColumn();
-            if (!$cur) break;
 
+            // Get bonus for this generation level
             $bonus = (float)($levels[$lvl] ?? 0);
-            if ($bonus <= 0) continue;
+            if ($bonus <= 0) {
+                // Still continue walking if higher levels might have bonus (optional)
+                // or break; if you want to stop at first zero
+            }
 
-            $pdo = db();
-            $pdo->prepare("
-                INSERT INTO commissions
-                  (user_id, type, amount, source_user_id, level, description, status)
-                VALUES (?, 'indirect_referral', ?, ?, ?, ?, 'credited')
-            ")->execute([
-                $cur, $bonus, $newUserId, $lvl,
-                "Indirect referral bonus — Level {$lvl}"
-            ]);
+            if ($bonus > 0) {
+                // Insert commission record
+                $pdo->prepare("
+                    INSERT INTO commissions
+                      (user_id, type, amount, source_user_id, level, description, status)
+                    VALUES (?, 'indirect_referral', ?, ?, ?, ?, 'credited')
+                ")->execute([
+                    $cur,
+                    $bonus,
+                    $newUserId,
+                    $lvl,
+                    "Unilevel Generation {$lvl} bonus"
+                ]);
 
-            $commId = (int)$pdo->lastInsertId();
-            Ewallet::credit($cur, $bonus, $commId, 'commission', "Indirect referral — Level {$lvl}");
+                $commId = (int)$pdo->lastInsertId();
+
+                // Credit to e-wallet
+                Ewallet::credit($cur, $bonus, $commId, 'commission', "Unilevel Generation {$lvl} — ₱" . number_format($bonus, 2));
+            }
+
+            // Move up to the next upline (sponsor first, then binary fallback)
+            $row = $pdo->prepare(
+                'SELECT sponsor_id, binary_parent_id FROM users WHERE id = ?'
+            );
+            $row->execute([$cur]);
+            $upRow = $row->fetch();
+
+            if (!$upRow) break;
+
+            $next = (int)($upRow['sponsor_id'] ?? 0);
+            if (!$next) {
+                $next = (int)($upRow['binary_parent_id'] ?? 0);
+            }
+
+            if (!$next || isset($visited[$next])) break;
+
+            $visited[$next] = true;
+            $cur = $next;
         }
     }
 
@@ -169,7 +203,10 @@ class Commission
               (user_id, type, amount, source_user_id, pairs_count, description, status)
             VALUES (?, 'pairing', ?, ?, ?, ?, 'credited')
         ")->execute([
-            $userId, $amount, $sourceId, $pairs,
+            $userId,
+            $amount,
+            $sourceId,
+            $pairs,
             "{$pairs} pair(s) × {$perPair}"
         ]);
 
@@ -184,7 +221,9 @@ class Commission
               (user_id, type, amount, source_user_id, pairs_count, description, status)
             VALUES (?, 'pairing', 0.00, ?, ?, ?, 'flushed')
         ")->execute([
-            $userId, $sourceId, $pairs,
+            $userId,
+            $sourceId,
+            $pairs,
             "{$pairs} pair(s) flushed — daily cap reached"
         ]);
     }
@@ -240,7 +279,9 @@ class Commission
              LEFT JOIN users u ON u.id = c.source_user_id
              WHERE  {$where}
              ORDER BY c.created_at DESC",
-            $params, $page, $perPage
+            $params,
+            $page,
+            $perPage
         );
     }
 }
