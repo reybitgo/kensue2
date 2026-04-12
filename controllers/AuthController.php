@@ -95,9 +95,9 @@ class AuthController
             redirect('/?page=register');
         }
 
-        // Validate binary upline
+        // Validate binary upline — any existing user can be an upline
         $upline = User::findByUsername($uplineU);
-        if (!$upline || $upline['role'] !== 'member') {
+        if (!$upline) {
             flash('error', 'Binary upline username not found.');
             redirect('/?page=register');
         }
@@ -192,9 +192,10 @@ class AuthController
         $username = strtolower(trim($_GET['username'] ?? ''));
         $position = $_GET['position'] ?? '';
 
+        // Any existing user (member OR admin) can be a binary upline
         $user = User::findByUsername($username);
-        if (!$user || $user['role'] !== 'member') {
-            json_response(['valid' => false, 'message' => 'Member not found.']);
+        if (!$user) {
+            json_response(['valid' => false, 'message' => 'User not found.']);
         }
 
         $leftFree  = User::isSlotFree((int)$user['id'], 'left');
