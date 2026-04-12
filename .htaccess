@@ -17,6 +17,11 @@ Options -MultiViews
   Allow from all
 </Files>
 
+<Files "reset.php">
+  Order Allow,Deny
+  Allow from all
+</Files>
+
 # Route everything through index.php
 <IfModule mod_rewrite.c>
   RewriteEngine On
