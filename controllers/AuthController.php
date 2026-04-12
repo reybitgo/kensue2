@@ -88,9 +88,9 @@ class AuthController
             redirect('/?page=register');
         }
 
-        // Validate sponsor
+        // Validate sponsor — any existing user can be a sponsor
         $sponsor = User::findByUsername($sponsorU);
-        if (!$sponsor || $sponsor['role'] !== 'member') {
+        if (!$sponsor) {
             flash('error', 'Sponsor username not found.');
             redirect('/?page=register');
         }

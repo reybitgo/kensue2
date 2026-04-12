@@ -73,7 +73,7 @@ if ($isLoggedIn && !$prefillSponsor && ($currentUser['role'] ?? '') === 'member'
       <div class="reg-step"        id="step-ind-3"><div class="step-dot">3</div><div class="step-text">Confirm</div></div>
     </div>
 
-    <div style="padding:0 2.25rem;"><?= render_flash() ?></div>
+    <div style="padding:0 2.25rem;" id="flashArea"><?= render_flash() ?></div>
 
     <form method="POST" action="<?= APP_URL ?>/?page=do_register" id="regForm">
       <?= csrf_field() ?>
@@ -240,6 +240,9 @@ function goStep(n) {
     const el = document.getElementById('step-ind-'+i);
     el.className = 'reg-step ' + (i<n?'done':i===n?'active':'');
   });
+  // Clear server flash errors when navigating — they no longer apply
+  const flash = document.getElementById('flashArea');
+  if (flash) flash.innerHTML = '';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
