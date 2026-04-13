@@ -63,10 +63,25 @@
           <div class="card">
             <div class="card-header"><span class="card-title">🔒 Change Password</span></div>
             <div class="card-body">
-              <div class="mb-3"><label class="form-label">Current Password</label><input type="password" name="current_password" class="form-control" placeholder="Current password" autocomplete="current-password"></div>
+              <div class="mb-3"><label class="form-label">Current Password</label>
+                <div class="input-group">
+                  <input type="password" name="current_password" id="cur_pw" class="form-control" placeholder="Current password" autocomplete="current-password">
+                  <button type="button" class="btn btn-outline-secondary" onclick="togglePw('cur_pw',this)">👁</button>
+                </div>
+              </div>
               <div class="row g-3">
-                <div class="col-md-6 mb-3"><label class="form-label">New Password</label><input type="password" name="new_password" class="form-control" minlength="8" placeholder="Min. 8 characters" autocomplete="new-password"></div>
-                <div class="col-md-6 mb-3"><label class="form-label">Confirm New</label><input type="password" name="new_password_confirm" class="form-control" placeholder="Repeat password" autocomplete="new-password"></div>
+                <div class="col-md-6 mb-3"><label class="form-label">New Password</label>
+                  <div class="input-group">
+                    <input type="password" name="new_password" id="new_pw" class="form-control" minlength="8" placeholder="Min. 8 characters" autocomplete="new-password">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePw('new_pw',this)">👁</button>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3"><label class="form-label">Confirm New</label>
+                  <div class="input-group">
+                    <input type="password" name="new_password_confirm" id="confirm_pw" class="form-control" placeholder="Repeat password" autocomplete="new-password">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePw('confirm_pw',this)">👁</button>
+                  </div>
+                </div>
               </div>
               <p class="form-text mb-0">Leave blank to keep your current password.</p>
             </div>
@@ -83,6 +98,12 @@ function previewPhoto(input) {
   const reader = new FileReader();
   reader.onload = e => { document.getElementById('avatarWrap').innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">'; };
   reader.readAsDataURL(input.files[0]);
+}
+
+function togglePw(id, btn) {
+  const el = document.getElementById(id);
+  el.type  = el.type === 'password' ? 'text' : 'password';
+  btn.textContent = el.type === 'password' ? '👁' : '🙈';
 }
 </script>
 <?php require 'views/partials/footer.php'; ?>
