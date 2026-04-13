@@ -183,7 +183,7 @@ INSERT INTO package_indirect_levels (package_id, level, bonus) VALUES
 
 -- System settings
 INSERT INTO settings (key_name, value) VALUES
-  ('site_name',         'NetPro MLM'),
+  ('site_name',         'Kensue'),
   ('site_tagline',      'Build Your Network. Grow Your Income.'),
   ('min_payout',        '500'),
   ('last_reset',        ''),
