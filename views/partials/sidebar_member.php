@@ -18,6 +18,12 @@ $nav = [
   ['page' => 'profile', 'icon' => '⚙️', 'label' => 'Profile & Settings', 'pages' => ['profile']],
 ];
 
+// Add Admin View link if the logged-in user is an admin browsing as member
+if (Auth::isAdmin()) {
+  $nav[] = 'SEPARATOR:Admin';
+  $nav[] = ['page' => 'admin', 'icon' => '📊', 'label' => 'Admin View', 'pages' => []];
+}
+
 function memberNavActive($item, $cp, $view) {
   if (!isset($item['pages'])) return false;
   if (!in_array($cp, $item['pages'])) return false;
