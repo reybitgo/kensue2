@@ -3,8 +3,8 @@ $pageTitle      = 'Register Member — ' . setting('site_name', APP_NAME);
 $isLoggedIn     = Auth::check();
 $currentUser    = $isLoggedIn ? Auth::user() : null;
 $prefillSponsor = $prefillSponsor ?? trim($_GET['sponsor'] ?? '');
-// If logged-in member, default sponsor to themselves
-if ($isLoggedIn && !$prefillSponsor && ($currentUser['role'] ?? '') === 'member') {
+// Auto-prefill sponsor with current user's username for both members AND admins
+if ($isLoggedIn && !$prefillSponsor) {
     $prefillSponsor = $currentUser['username'];
 }
 ?>
