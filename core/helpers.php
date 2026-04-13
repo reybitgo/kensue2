@@ -90,19 +90,21 @@ function flash(string $key, string $msg = ''): string
  */
 function render_flash(): string
 {
+    // Map flash key → Bootstrap 5 alert class + icon
     $types = [
-        'success' => ['bg-success-light', 'text-success', '✓'],
-        'error'   => ['bg-danger-light',  'text-danger',  '✕'],
-        'info'    => ['bg-info-light',    'text-info',    'ℹ'],
-        'warning' => ['bg-warning-light', 'text-warning', '⚠'],
+        'success' => ['alert-success', '✓'],
+        'error'   => ['alert-danger',  '✕'],
+        'info'    => ['alert-info',    'ℹ'],
+        'warning' => ['alert-warning', '⚠'],
     ];
     $html = '';
-    foreach ($types as $key => [$bg, $text, $icon]) {
+    foreach ($types as $key => [$bsClass, $icon]) {
         $msg = flash($key);
         if ($msg) {
             $html .= sprintf(
-                '<div class="alert alert-%s"><span class="alert-icon">%s</span><span>%s</span></div>',
-                $key, $icon, e($msg)
+                '<div class="alert %s d-flex align-items-center gap-2 mb-3" role="alert">' .
+                '<span>%s</span><span>%s</span></div>',
+                $bsClass, $icon, e($msg)
             );
         }
     }
