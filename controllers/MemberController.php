@@ -37,21 +37,43 @@ class MemberController
         // Handle photo upload
         if (!empty($_FILES['photo']['tmp_name'])) {
             $file = $_FILES['photo'];
-            $mime = mime_content_type($file['tmp_name']);
+
+            // Verify MIME type
+            $mime    = mime_content_type($file['tmp_name']);
             $allowed = ['image/jpeg', 'image/png', 'image/webp'];
             if (!in_array($mime, $allowed)) {
                 flash('error', 'Photo must be JPEG, PNG, or WebP.');
                 redirect('/?page=profile');
             }
-            if ($file['size'] > 2 * 1024 * 1024) {
+            if ($file['size'] > 2 * 1024 * 1024) { // 2 MB — phone photos can be large
                 flash('error', 'Photo must be under 2MB.');
                 redirect('/?page=profile');
             }
+
+            // Use absolute path so it works regardless of PHP's working directory.
+            // dirname(__DIR__) = the project root (parent of /controllers/)
+            $uploadDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
+
+            // Create directory if missing
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
             $ext  = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'][$mime];
             $name = 'photo_' . $id . '_' . time() . '.' . $ext;
-            move_uploaded_file($file['tmp_name'], 'uploads/' . $name);
-            // Delete old photo
-            if ($user['photo']) @unlink('uploads/' . $user['photo']);
+            $dest = $uploadDir . $name;
+
+            if (!move_uploaded_file($file['tmp_name'], $dest)) {
+                flash('error', 'Failed to save photo. Check that the uploads/ folder exists and is writable.');
+                redirect('/?page=profile');
+            }
+
+            // Delete old photo file if it exists
+            if (!empty($user['photo'])) {
+                $old = $uploadDir . $user['photo'];
+                if (file_exists($old)) @unlink($old);
+            }
+
             $data['photo'] = $name;
         }
 
