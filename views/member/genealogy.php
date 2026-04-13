@@ -183,12 +183,16 @@ function resetTree() { scale=1; offsetX=0; offsetY=0; loadTree(); }
 window.addEventListener('resize', drawTree);
 loadTree();
 </script>
+<?php endif; ?>
+
 <script>
 function toggleRef(lvl) {
-  const el=document.getElementById('refLevel'+lvl), arrow=document.getElementById('refArrow'+lvl);
-  el.style.display=el.style.display==='none'?'block':'none';
-  arrow.textContent=el.style.display==='none'?'▶':'▼';
+  const el    = document.getElementById('refLevel' + lvl);
+  const arrow = document.getElementById('refArrow' + lvl);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display    = hidden ? 'block' : 'none';
+  arrow.textContent   = hidden ? '▼' : '▶';
 }
 </script>
-<?php endif; ?>
 <?php require 'views/partials/footer.php'; ?>
