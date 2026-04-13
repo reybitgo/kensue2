@@ -30,7 +30,10 @@ class AdminController
         Auth::guard('admin');
         $id   = (int)($_GET['id'] ?? 0);
         $user = User::find($id);
-        if (!$user) { flash('error', 'User not found.'); redirect('/?page=admin_users'); }
+        if (!$user) {
+            flash('error', 'User not found.');
+            redirect('/?page=admin_users');
+        }
 
         $summary  = Commission::summary($id);
         $payouts  = Payout::forUser($id);
@@ -44,14 +47,52 @@ class AdminController
     {
         Auth::guard('admin');
         csrf_verify();
+
         $id   = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            flash('error', 'Invalid user ID.');
+            redirect('/?page=admin_users');
+            return;
+        }
+
         $user = User::find($id);
         if (!$user || $user['role'] === 'admin') {
-            json_response(['ok' => false, 'error' => 'Invalid user.'], 400);
+            flash('error', 'Invalid user or cannot modify administrator account.');
+            redirect('/?page=admin_users');
+            return;
         }
+
         $newStatus = $user['status'] === 'active' ? 'suspended' : 'active';
-        db()->prepare('UPDATE users SET status = ? WHERE id = ?')->execute([$newStatus, $id]);
-        json_response(['ok' => true, 'status' => $newStatus]);
+
+        $pdo = db();
+        $stmt = $pdo->prepare('UPDATE users SET status = ? WHERE id = ?');
+        $success = $stmt->execute([$newStatus, $id]);
+
+        if ($success) {
+            $action = ($newStatus === 'active') ? 'activated' : 'suspended';
+            flash('success', "User @{$user['username']} has been {$action} successfully.");
+        } else {
+            flash('error', 'Failed to update user status. Please try again.');
+        }
+
+        // Return JSON only for AJAX requests
+        if (
+            isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) {
+            json_response(['ok' => $success, 'status' => $newStatus]);
+        }
+
+        // ── Smart Redirect Logic ─────────────────────────────────────
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+
+        // If came from user view page → stay on that user's view
+        if (strpos($referer, 'admin_user_view') !== false && strpos($referer, "id={$id}") !== false) {
+            redirect("/?page=admin_user_view&id={$id}");
+        }
+
+        // Otherwise (from members list or anywhere else) → go back to members list
+        redirect('/?page=admin_users');
     }
 
     // ── Packages ──────────────────────────────────────────────────────────────
@@ -171,8 +212,10 @@ class AdminController
                 break;
             case 'complete':
                 $result = Payout::complete($id, $adminId, $note);
-                flash($result['ok'] ? 'success' : 'error',
-                      $result['ok'] ? 'Payout marked as completed. E-wallet deducted.' : $result['error']);
+                flash(
+                    $result['ok'] ? 'success' : 'error',
+                    $result['ok'] ? 'Payout marked as completed. E-wallet deducted.' : $result['error']
+                );
                 break;
             default:
                 flash('error', 'Unknown action.');

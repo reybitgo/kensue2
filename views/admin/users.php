@@ -7,8 +7,16 @@
     <?= render_flash() ?>
     <?php $counts = User::counts(); ?>
     <div class="row g-3 mb-3">
-      <?php foreach ([['Total',(int)$counts['total'],'primary'],['Active',(int)$counts['active'],'success'],['Suspended',(int)$counts['suspended'],'danger'],['Joined Today',(int)$counts['joined_today'],'warning']] as [$l,$v,$c]): ?>
-      <div class="col-6 col-xl-3"><div class="card stat-card"><div class="stat-accent stat-accent-<?= $c ?>"></div><div class="card-body pt-4"><div class="stat-label"><?= $l ?></div><div class="stat-value text-<?= $c ?>"><?= number_format($v) ?></div></div></div></div>
+      <?php foreach ([['Total', (int)$counts['total'], 'primary'], ['Active', (int)$counts['active'], 'success'], ['Suspended', (int)$counts['suspended'], 'danger'], ['Joined Today', (int)$counts['joined_today'], 'warning']] as [$l, $v, $c]): ?>
+        <div class="col-6 col-xl-3">
+          <div class="card stat-card">
+            <div class="stat-accent stat-accent-<?= $c ?>"></div>
+            <div class="card-body pt-4">
+              <div class="stat-label"><?= $l ?></div>
+              <div class="stat-value text-<?= $c ?>"><?= number_format($v) ?></div>
+            </div>
+          </div>
+        </div>
       <?php endforeach; ?>
     </div>
 
@@ -20,56 +28,77 @@
           <div class="col-6 col-md-2">
             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
               <option value="">All Statuses</option>
-              <?php foreach (['active','suspended','pending'] as $s): ?><option value="<?= $s ?>" <?= $status===$s?'selected':'' ?>><?= ucfirst($s) ?></option><?php endforeach; ?>
+              <?php foreach (['active', 'suspended', 'pending'] as $s): ?><option value="<?= $s ?>" <?= $status === $s ? 'selected' : '' ?>><?= ucfirst($s) ?></option><?php endforeach; ?>
             </select>
           </div>
           <div class="col-6 col-md-2">
             <select name="pkg" class="form-select form-select-sm" onchange="this.form.submit()">
               <option value="">All Packages</option>
-              <?php foreach ($packages as $pkg): ?><option value="<?= $pkg['id'] ?>" <?= $pkgId===(int)$pkg['id']?'selected':'' ?>><?= e($pkg['name']) ?></option><?php endforeach; ?>
+              <?php foreach ($packages as $pkg): ?><option value="<?= $pkg['id'] ?>" <?= $pkgId === (int)$pkg['id'] ? 'selected' : '' ?>><?= e($pkg['name']) ?></option><?php endforeach; ?>
             </select>
           </div>
           <div class="col-auto d-flex gap-2">
             <button type="submit" class="btn btn-primary btn-sm">Search</button>
-            <?php if ($search||$status||$pkgId): ?><a href="<?= APP_URL ?>/?page=admin_users" class="btn btn-outline-secondary btn-sm">✕ Clear</a><?php endif; ?>
+            <?php if ($search || $status || $pkgId): ?><a href="<?= APP_URL ?>/?page=admin_users" class="btn btn-outline-secondary btn-sm">✕ Clear</a><?php endif; ?>
           </div>
         </form>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
-          <thead><tr><th>#</th><th>Username</th><th>Full Name</th><th>Package</th><th>Balance</th><th>Pairs</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Package</th>
+              <th>Balance</th>
+              <th>Pairs</th>
+              <th>Joined</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody>
-          <?php if (empty($result['data'])): ?>
-            <tr><td colspan="9" class="text-center py-5 text-muted">No members found.</td></tr>
-          <?php else: foreach ($result['data'] as $i => $m): ?>
-          <tr>
-            <td class="td-muted" style="font-size:.7rem;"><?= ($result['page']-1)*25+$i+1 ?></td>
-            <td><a href="<?= APP_URL ?>/?page=admin_user_view&id=<?= $m['id'] ?>" class="fw-bold text-decoration-none">@<?= e($m['username']) ?></a></td>
-            <td style="font-size:.825rem;"><?= e($m['full_name']??'—') ?></td>
-            <td><span class="badge bg-primary-subtle text-primary"><?= e($m['package_name']??'—') ?></span></td>
-            <td class="td-green font-mono fw-bold"><?= fmt_money($m['ewallet_balance']) ?></td>
-            <td class="td-muted font-mono"><?= number_format($m['pairs_paid']) ?></td>
-            <td class="td-muted" style="font-size:.75rem;"><?= fmt_date($m['joined_at']) ?></td>
-            <td><?php $b=$m['status']==='active'?'bg-success-subtle text-success':($m['status']==='suspended'?'bg-danger-subtle text-danger':'bg-warning-subtle text-warning'); ?><span class="badge <?= $b ?>"><?= ucfirst($m['status']) ?></span></td>
-            <td>
-              <div class="d-flex gap-1">
-                <a href="<?= APP_URL ?>/?page=admin_user_view&id=<?= $m['id'] ?>" class="btn btn-sm btn-outline-primary">View</a>
-                <form method="POST" action="<?= APP_URL ?>/?page=admin_toggle_user" class="m-0">
-                  <?= csrf_field() ?><input type="hidden" name="id" value="<?= $m['id'] ?>">
-                  <?php $isSuspend = $m['status']==='active'; ?>
-                  <button type="button" class="btn btn-sm <?= $isSuspend?'btn-outline-danger':'btn-outline-success' ?>"
-                    onclick="showConfirm({title:'<?= $isSuspend?'Suspend':'Activate' ?> Member',message:'<?= $isSuspend?'Suspend':'Activate' ?> <strong>@<?= e($m['username']) ?></strong>?',confirmText:'<?= $isSuspend?'Suspend':'Activate' ?>',confirmClass:'<?= $isSuspend?'btn-danger':'btn-success' ?>',onConfirm:()=>this.closest(\'form\').submit()})">
-                    <?= $isSuspend ? 'Suspend' : 'Activate' ?>
-                  </button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          <?php endforeach; endif; ?>
+            <?php if (empty($result['data'])): ?>
+              <tr>
+                <td colspan="9" class="text-center py-5 text-muted">No members found.</td>
+              </tr>
+              <?php else: foreach ($result['data'] as $i => $m): ?>
+                <tr>
+                  <td class="td-muted" style="font-size:.7rem;"><?= ($result['page'] - 1) * 25 + $i + 1 ?></td>
+                  <td><a href="<?= APP_URL ?>/?page=admin_user_view&id=<?= $m['id'] ?>" class="fw-bold text-decoration-none">@<?= e($m['username']) ?></a></td>
+                  <td style="font-size:.825rem;"><?= e($m['full_name'] ?? '—') ?></td>
+                  <td><span class="badge bg-primary-subtle text-primary"><?= e($m['package_name'] ?? '—') ?></span></td>
+                  <td class="td-green font-mono fw-bold"><?= fmt_money($m['ewallet_balance']) ?></td>
+                  <td class="td-muted font-mono"><?= number_format($m['pairs_paid']) ?></td>
+                  <td class="td-muted" style="font-size:.75rem;"><?= fmt_date($m['joined_at']) ?></td>
+                  <td><?php $b = $m['status'] === 'active' ? 'bg-success-subtle text-success' : ($m['status'] === 'suspended' ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning'); ?><span class="badge <?= $b ?>"><?= ucfirst($m['status']) ?></span></td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      <a href="<?= APP_URL ?>/?page=admin_user_view&id=<?= $m['id'] ?>" class="btn btn-sm btn-outline-primary">View</a>
+                      <form method="POST" action="<?= APP_URL ?>/?page=admin_toggle_user" class="m-0" id="toggleForm<?= $m['id'] ?>">
+                        <?= csrf_field() ?><input type="hidden" name="id" value="<?= $m['id'] ?>">
+                        <?php $isSuspend = $m['status'] === 'active'; ?>
+                        <button type="button" class="btn btn-sm <?= $isSuspend ? 'btn-outline-danger' : 'btn-outline-success' ?>"
+                          onclick="showConfirm({
+            title: '<?= $isSuspend ? 'Suspend' : 'Activate' ?> Member',
+            message: 'Are you sure you want to <?= $isSuspend ? 'suspend' : 'activate' ?> <strong>@<?= e($user['username']) ?></strong>?',
+            confirmText: '<?= $isSuspend ? 'Suspend' : 'Activate' ?>',
+            confirmClass: '<?= $isSuspend ? 'btn-danger' : 'btn-success' ?>',
+            onConfirm: () => this.closest('form').submit()
+        })">
+                          <?= $isSuspend ? '🔒 Suspend' : '✅ Activate' ?>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                <?php if ($result['total_pages'] > 1): ?><div class="card-footer"><?= pagination_links($result, APP_URL . '/?page=admin_users&q=' . urlencode($search) . '&status=' . $status . '&pkg=' . $pkgId) ?></div><?php endif; ?>
+            <?php endforeach;
+            endif; ?>
           </tbody>
         </table>
       </div>
-      <?php if ($result['total_pages'] > 1): ?><div class="card-footer"><?= pagination_links($result, APP_URL.'/?page=admin_users&q='.urlencode($search).'&status='.$status.'&pkg='.$pkgId) ?></div><?php endif; ?>
     </div>
   </div>
 </div>

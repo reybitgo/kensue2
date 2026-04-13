@@ -67,7 +67,7 @@
             <form method="POST" action="<?= APP_URL ?>/?page=admin_manual_reset" class="m-0">
               <?= csrf_field() ?>
               <button type="button" class="btn btn-outline-warning w-100"
-                onclick="showConfirm({title:'Run Daily Reset',message:'Reset <code>pairs_paid_today = 0</code> for ALL active members now? This simulates the midnight cron.',confirmText:'⟳ Run Reset',confirmClass:'btn-warning',onConfirm:()=>this.closest(\'form\').submit()})">
+                onclick="showConfirm({title:'Run Daily Reset',message:'Reset <code>pairs_paid_today = 0</code> for ALL active members now? This simulates the midnight cron.',confirmText:'⟳ Run Reset',confirmClass:'btn-warning',formId:'manualResetForm'})">
                 ⟳ Run Daily Reset Now
               </button>
             </form>
