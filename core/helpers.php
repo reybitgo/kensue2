@@ -1,6 +1,24 @@
 <?php
 // ── Output / Escaping ────────────────────────────────────────────────────────
 
+// ── User Helper Functions ────────────────────────────────────────────────────
+
+/**
+ * Get a user by ID.
+ * Returns the full user row as associative array, or null if not found.
+ */
+function getUserById(int $id): ?array
+{
+    $pdo = db();  // Uses your existing db() helper
+
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $user ?: null;
+}
+
 /**
  * HTML-escape a value for safe output.
  */
@@ -103,8 +121,10 @@ function render_flash(): string
         if ($msg) {
             $html .= sprintf(
                 '<div class="alert %s d-flex align-items-center gap-2 mb-3" role="alert">' .
-                '<span>%s</span><span>%s</span></div>',
-                $bsClass, $icon, e($msg)
+                    '<span>%s</span><span>%s</span></div>',
+                $bsClass,
+                $icon,
+                e($msg)
             );
         }
     }
