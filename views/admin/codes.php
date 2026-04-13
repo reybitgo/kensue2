@@ -124,7 +124,18 @@
           <?php else: foreach ($codes['data'] as $i => $c): ?>
           <tr>
             <td class="td-muted" style="font-size:.72rem;"><?= ($codes['page']-1)*25 + $i + 1 ?></td>
-            <td><span class="reg-code"><?= e($c['code']) ?></span></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="reg-code"><?= e($c['code']) ?></span>
+                <button type="button"
+                  class="btn btn-sm btn-link p-0 text-muted"
+                  onclick="copyText('<?= e($c['code']) ?>')"
+                  title="Copy code"
+                  style="font-size:.85rem;line-height:1;text-decoration:none;">
+                  📋
+                </button>
+              </div>
+            </td>
             <td><span class="badge bg-primary-subtle text-primary"><?= e($c['package_name']) ?></span></td>
             <td class="font-mono fw-bold"><?= fmt_money($c['price']) ?></td>
             <td><?php $b=match($c['status']){'unused'=>'bg-success-subtle text-success','used'=>'bg-secondary-subtle text-secondary','expired'=>'bg-danger-subtle text-danger',default=>'bg-secondary-subtle'}; ?>
