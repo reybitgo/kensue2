@@ -80,26 +80,23 @@
                         <?= csrf_field() ?><input type="hidden" name="id" value="<?= $m['id'] ?>">
                         <?php $isSuspend = $m['status'] === 'active'; ?>
                         <button type="button" class="btn btn-sm <?= $isSuspend ? 'btn-outline-danger' : 'btn-outline-success' ?>"
-                          onclick="showConfirm({
-            title: '<?= $isSuspend ? 'Suspend' : 'Activate' ?> Member',
-            message: 'Are you sure you want to <?= $isSuspend ? 'suspend' : 'activate' ?> <strong>@<?= e($user['username']) ?></strong>?',
-            confirmText: '<?= $isSuspend ? 'Suspend' : 'Activate' ?>',
-            confirmClass: '<?= $isSuspend ? 'btn-danger' : 'btn-success' ?>',
-            onConfirm: () => this.closest('form').submit()
-        })">
+                          <button type="button" class="btn btn-sm <?= $isSuspend ? 'btn-outline-danger' : 'btn-outline-success' ?>"
+                          onclick="showConfirm({title:'<?= $isSuspend ? 'Suspend' : 'Activate' ?> Member',message:'<?= $isSuspend ? 'Suspend' : 'Activate' ?> @<?= e($m['username']) ?>?',confirmText:'<?= $isSuspend ? 'Suspend' : 'Activate' ?>',confirmClass:'<?= $isSuspend ? 'btn-danger' : 'btn-success' ?>',formId:'toggleForm<?= $m['id'] ?>'})">
                           <?= $isSuspend ? '🔒 Suspend' : '✅ Activate' ?>
                         </button>
                       </form>
                     </div>
                   </td>
                 </tr>
-                <?php if ($result['total_pages'] > 1): ?><div class="card-footer"><?= pagination_links($result, APP_URL . '/?page=admin_users&q=' . urlencode($search) . '&status=' . $status . '&pkg=' . $pkgId) ?></div><?php endif; ?>
             <?php endforeach;
             endif; ?>
           </tbody>
         </table>
-      </div>
-    </div>
-  </div>
-</div>
+      </div><!-- /.table-responsive -->
+      <?php if ($result && $result['total_pages'] > 1): ?>
+        <div class="card-footer"><?= pagination_links($result, APP_URL . '/?page=admin_users&q=' . urlencode($search) . '&status=' . $status . '&pkg=' . $pkgId) ?></div>
+      <?php endif; ?>
+    </div><!-- /.card -->
+  </div><!-- /.page-content -->
+</div><!-- /.main-content -->
 <?php require 'views/partials/footer.php'; ?>

@@ -15,11 +15,11 @@
       </div>
       <?php $b = $user['status'] === 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'; ?>
       <span class="badge <?= $b ?>" style="font-size:.8rem;padding:.4em .9em;"><?= ucfirst($user['status']) ?></span>
-      <form method="POST" action="<?= APP_URL ?>/?page=admin_toggle_user" class="m-0">
+      <form method="POST" action="<?= APP_URL ?>/?page=admin_toggle_user" class="m-0" id="toggleFormUserView">
         <?= csrf_field() ?><input type="hidden" name="id" value="<?= $user['id'] ?>">
         <?php $isSuspend = $user['status'] === 'active'; ?>
         <button type="button" class="btn btn-sm <?= $isSuspend ? 'btn-outline-danger' : 'btn-outline-success' ?>"
-          onclick="showConfirm({title:'<?= $isSuspend ? 'Suspend' : 'Activate' ?> Member',message:'<?= $isSuspend ? 'Suspend' : 'Activate' ?> <strong>@<?= e($user['username']) ?></strong>?',confirmText:'<?= $isSuspend ? 'Suspend' : 'Activate' ?>',confirmClass:'<?= $isSuspend ? 'btn-danger' : 'btn-success' ?>',onConfirm:()=>this.closest(\'form\').submit()})">
+          onclick="showConfirm({title:'<?= $isSuspend ? 'Suspend' : 'Activate' ?> Member',message:'<?= $isSuspend ? 'Suspend' : 'Activate' ?> @<?= e($user['username']) ?>?',confirmText:'<?= $isSuspend ? 'Suspend' : 'Activate' ?>',confirmClass:'<?= $isSuspend ? 'btn-danger' : 'btn-success' ?>',formId:'toggleFormUserView'})">
           <?= $isSuspend ? '🔒 Suspend' : '✅ Activate' ?>
         </button>
       </form>
