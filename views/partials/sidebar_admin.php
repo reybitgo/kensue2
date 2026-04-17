@@ -6,46 +6,47 @@ $initial = strtoupper(substr($user['username'] ?? 'A', 0, 1));
 $pendingPayouts = (int)db()->query("SELECT COUNT(*) FROM payout_requests WHERE status='pending'")->fetchColumn();
 $pendingMembers = (int)db()->query("SELECT COUNT(*) FROM users WHERE role='member' AND status='pending'")->fetchColumn();
 
-function renderAdminNav($cp, $user, $initial, $pendingPayouts, $pendingMembers) { ?>
+function renderAdminNav($cp, $user, $initial, $pendingPayouts, $pendingMembers)
+{ ?>
   <div class="sidebar-brand">
-    <div class="brand-icon">
-      <img src="<?= APP_URL ?>/assets/img/logo.png" alt="Logo">
-    </div>
     <div>
-      <div class="brand-name"><?= e(setting('site_name', APP_NAME)) ?></div>
+      <div class="auth-header">
+        <img src="<?= APP_URL ?>/assets/img/logo.png" alt="FarmBouy"
+          style="max-width:260px;width:100%;height:auto;display:block;margin:0 auto;">
+      </div>
       <div class="brand-sub">Admin Panel</div>
     </div>
   </div>
 
   <nav class="sidebar-nav">
     <div class="nav-section-label">Overview</div>
-    <a href="<?= APP_URL ?>/?page=admin" class="nav-item-link <?= $cp==='admin'?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=admin" class="nav-item-link <?= $cp === 'admin' ? 'active' : '' ?>">
       <span class="nav-icon">📊</span> Dashboard
     </a>
 
     <div class="nav-section-label">Management</div>
-    <a href="<?= APP_URL ?>/?page=admin_users" class="nav-item-link <?= in_array($cp,['admin_users','admin_user_view'])?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=admin_users" class="nav-item-link <?= in_array($cp, ['admin_users', 'admin_user_view']) ? 'active' : '' ?>">
       <span class="nav-icon">👥</span> Members
       <?php if ($pendingMembers): ?><span class="nav-badge"><?= $pendingMembers ?></span><?php endif; ?>
     </a>
-    <a href="<?= APP_URL ?>/?page=admin_packages" class="nav-item-link <?= $cp==='admin_packages'?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=admin_packages" class="nav-item-link <?= $cp === 'admin_packages' ? 'active' : '' ?>">
       <span class="nav-icon">📦</span> Packages
     </a>
-    <a href="<?= APP_URL ?>/?page=admin_codes" class="nav-item-link <?= $cp==='admin_codes'?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=admin_codes" class="nav-item-link <?= $cp === 'admin_codes' ? 'active' : '' ?>">
       <span class="nav-icon">🎟️</span> Reg Codes
     </a>
-    <a href="<?= APP_URL ?>/?page=register" class="nav-item-link <?= $cp==='register'?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=register" class="nav-item-link <?= $cp === 'register' ? 'active' : '' ?>">
       <span class="nav-icon">➕</span> Register Member
     </a>
 
     <div class="nav-section-label">Finance</div>
-    <a href="<?= APP_URL ?>/?page=admin_payouts" class="nav-item-link <?= $cp==='admin_payouts'?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=admin_payouts" class="nav-item-link <?= $cp === 'admin_payouts' ? 'active' : '' ?>">
       <span class="nav-icon">💸</span> Payouts
       <?php if ($pendingPayouts): ?><span class="nav-badge"><?= $pendingPayouts ?></span><?php endif; ?>
     </a>
 
     <div class="nav-section-label">System</div>
-    <a href="<?= APP_URL ?>/?page=admin_settings" class="nav-item-link <?= $cp==='admin_settings'?'active':'' ?>">
+    <a href="<?= APP_URL ?>/?page=admin_settings" class="nav-item-link <?= $cp === 'admin_settings' ? 'active' : '' ?>">
       <span class="nav-icon">⚙️</span> Settings
     </a>
     <a href="<?= APP_URL ?>/?page=dashboard" class="nav-item-link">
@@ -74,10 +75,10 @@ function renderAdminNav($cp, $user, $initial, $pendingPayouts, $pendingMembers) 
 
 <!-- Mobile offcanvas -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar"
-     style="width:var(--sidebar-w)!important;background:var(--sidebar-bg)!important;">
+  style="width:var(--sidebar-w)!important;background:var(--sidebar-bg)!important;">
   <div class="offcanvas-header" style="padding:.5rem 0 0;border:none;">
     <button type="button" class="btn-close btn-close-white ms-auto me-3 mt-2"
-            data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body p-0 d-flex flex-column" style="overflow-y:auto;">
     <?php renderAdminNav($cp, $user, $initial, $pendingPayouts, $pendingMembers); ?>

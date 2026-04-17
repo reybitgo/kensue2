@@ -1,6 +1,7 @@
 <?php $pageTitle = 'Login — ' . setting('site_name', APP_NAME); ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,58 +14,59 @@
   <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/main.css">
   <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/auth.css">
 </head>
+
 <body>
-<div class="auth-page">
-  <div class="auth-card">
-    <div class="auth-header">
-      <div class="auth-logo"><img src="<?= APP_URL ?>/assets/img/logo.png" alt="Logo"></div>
-      <h1><?= e(setting('site_name', APP_NAME)) ?></h1>
-      <p><?= e(setting('site_tagline', 'Build Your Network. Grow Your Income.')) ?></p>
-    </div>
-    <div class="auth-body">
-      <?= render_flash() ?>
-      <form method="POST" action="<?= APP_URL ?>/?page=do_login" id="loginForm">
-        <?= csrf_field() ?>
-        <div class="mb-3">
-          <label class="form-label" for="username">Username</label>
-          <div class="input-group">
-            <input type="text" id="username" name="username" class="form-control"
-              placeholder="Enter your username"
-              value="<?= e($_POST['username'] ?? '') ?>"
-              autocomplete="username" autofocus required>
-            <span class="input-group-text">👤</span>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header" style="padding:1.75rem 2.25rem;">
+        <img src="<?= APP_URL ?>/assets/img/logo.png" alt="FarmBouy"
+          style="max-width:260px;width:100%;height:auto;display:block;margin:0 auto;">
+      </div>
+      <div class="auth-body">
+        <?= render_flash() ?>
+        <form method="POST" action="<?= APP_URL ?>/?page=do_login" id="loginForm">
+          <?= csrf_field() ?>
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-group">
+              <input type="text" id="username" name="username" class="form-control"
+                placeholder="Enter your username"
+                value="<?= e($_POST['username'] ?? '') ?>"
+                autocomplete="username" autofocus required>
+              <span class="input-group-text">👤</span>
+            </div>
           </div>
-        </div>
-        <div class="mb-4">
-          <label class="form-label" for="password">Password</label>
-          <div class="input-group">
-            <input type="password" id="password" name="password" class="form-control"
-              placeholder="Enter your password" autocomplete="current-password" required>
-            <button type="button" class="btn btn-outline-secondary" id="togglePw">👁</button>
+          <div class="mb-4">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-group">
+              <input type="password" id="password" name="password" class="form-control"
+                placeholder="Enter your password" autocomplete="current-password" required>
+              <button type="button" class="btn btn-outline-secondary" id="togglePw">👁</button>
+            </div>
           </div>
-        </div>
-        <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold" id="loginBtn">
-          Sign In
-        </button>
-      </form>
-    </div>
-    <div class="auth-footer">
-      Don't have an account? <a href="<?= APP_URL ?>/?page=register">Register with a code →</a>
+          <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold" id="loginBtn">
+            Sign In
+          </button>
+        </form>
+      </div>
+      <div class="auth-footer">
+        Don't have an account? <a href="<?= APP_URL ?>/?page=register">Register with a code →</a>
+      </div>
     </div>
   </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.getElementById('togglePw').addEventListener('click', function() {
-  const pw = document.getElementById('password');
-  pw.type = pw.type === 'password' ? 'text' : 'password';
-  this.textContent = pw.type === 'password' ? '👁' : '🙈';
-});
-document.getElementById('loginForm').addEventListener('submit', function() {
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in…';
-});
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById('togglePw').addEventListener('click', function() {
+      const pw = document.getElementById('password');
+      pw.type = pw.type === 'password' ? 'text' : 'password';
+      this.textContent = pw.type === 'password' ? '👁' : '🙈';
+    });
+    document.getElementById('loginForm').addEventListener('submit', function() {
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in…';
+    });
+  </script>
 </body>
+
 </html>

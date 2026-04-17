@@ -11,9 +11,9 @@ $nav = [
   ['page' => 'earnings',  'icon' => '💰', 'label' => 'Earnings',         'pages' => ['earnings']],
   'SEPARATOR:Network',
   ['page' => 'genealogy&view=binary',  'icon' => '🌳', 'label' => 'Binary Tree',      'pages' => ['genealogy'], 'view' => 'binary'],
-  ['page' => 'genealogy&view=referral','icon' => '👥', 'label' => 'Referral Network', 'pages' => ['genealogy'], 'view' => 'referral'],
+  ['page' => 'genealogy&view=referral', 'icon' => '👥', 'label' => 'Referral Network', 'pages' => ['genealogy'], 'view' => 'referral'],
   'SEPARATOR:Account',
-  ['page' => 'register&sponsor='.$user['username'], 'icon' => '➕', 'label' => 'Register Member', 'pages' => ['register']],
+  ['page' => 'register&sponsor=' . $user['username'], 'icon' => '➕', 'label' => 'Register Member', 'pages' => ['register']],
   ['page' => 'payout',  'icon' => '💳', 'label' => 'Payouts',   'pages' => ['payout']],
   ['page' => 'profile', 'icon' => '⚙️', 'label' => 'Profile & Settings', 'pages' => ['profile']],
 ];
@@ -24,20 +24,22 @@ if (Auth::isAdmin()) {
   $nav[] = ['page' => 'admin', 'icon' => '📊', 'label' => 'Admin View', 'pages' => []];
 }
 
-function memberNavActive($item, $cp, $view) {
+function memberNavActive($item, $cp, $view)
+{
   if (!isset($item['pages'])) return false;
   if (!in_array($cp, $item['pages'])) return false;
   if (isset($item['view'])) return $view === $item['view'];
   return true;
 }
 
-function renderSidebarNav($nav, $cp, $user, $view, $initial, $name) { ?>
+function renderSidebarNav($nav, $cp, $user, $view, $initial, $name)
+{ ?>
   <div class="sidebar-brand">
-    <div class="brand-icon">
-      <img src="<?= APP_URL ?>/assets/img/logo.png" alt="Logo">
-    </div>
     <div>
-      <div class="brand-name"><?= e(setting('site_name', APP_NAME)) ?></div>
+      <div class="auth-header">
+        <img src="<?= APP_URL ?>/assets/img/logo.png" alt="FarmBouy"
+          style="max-width:260px;width:100%;height:auto;display:block;margin:0 auto;">
+      </div>
       <div class="brand-sub">Member Portal</div>
     </div>
   </div>
@@ -51,10 +53,10 @@ function renderSidebarNav($nav, $cp, $user, $view, $initial, $name) { ?>
       $active = memberNavActive($item, $cp, $view);
       $href   = APP_URL . '/?page=' . $item['page'];
     ?>
-    <a href="<?= $href ?>" class="nav-item-link <?= $active ? 'active' : '' ?>">
-      <span class="nav-icon"><?= $item['icon'] ?></span>
-      <?= e($item['label']) ?>
-    </a>
+      <a href="<?= $href ?>" class="nav-item-link <?= $active ? 'active' : '' ?>">
+        <span class="nav-icon"><?= $item['icon'] ?></span>
+        <?= e($item['label']) ?>
+      </a>
     <?php endforeach; ?>
   </nav>
 
@@ -83,10 +85,10 @@ function renderSidebarNav($nav, $cp, $user, $view, $initial, $name) { ?>
 
 <!-- Mobile offcanvas sidebar -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel"
-     style="width:var(--sidebar-w)!important;background:var(--sidebar-bg)!important;">
+  style="width:var(--sidebar-w)!important;background:var(--sidebar-bg)!important;">
   <div class="offcanvas-header d-flex align-items-center" style="padding:.5rem 0 0;border:none;">
     <button type="button" class="btn-close btn-close-white ms-auto me-3 mt-2"
-            data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body p-0 d-flex flex-column" style="overflow-y:auto;">
     <?php renderSidebarNav($nav, $cp, $user, $view, $initial, $name); ?>
