@@ -11,8 +11,8 @@ function renderAdminNav($cp, $user, $initial, $pendingPayouts, $pendingMembers)
   <div class="sidebar-brand">
     <div>
       <div class="auth-header">
-        <img src="<?= APP_URL ?>/assets/img/logo.png" alt="FarmBouy"
-          style="max-width:260px;width:100%;height:auto;display:block;margin:0 auto;">
+        <img src="<?= APP_URL ?>/assets/img/logo2.png" alt="FarmBouy"
+          style="max-width:260px;width:30%;height:auto;display:block;margin:0 auto;">
       </div>
       <div class="brand-sub">Admin Panel</div>
     </div>

@@ -18,9 +18,9 @@
 <body>
   <div class="auth-page">
     <div class="auth-card">
-      <div class="auth-header" style="padding:1.75rem 2.25rem;">
+      <div class="auth-header">
         <img src="<?= APP_URL ?>/assets/img/logo.png" alt="FarmBouy"
-          style="max-width:260px;width:100%;height:auto;display:block;margin:0 auto;">
+          style="max-width:260px;width:30%;height:auto;display:block;margin:0 auto;">
       </div>
       <div class="auth-body">
         <?= render_flash() ?>

@@ -11,7 +11,7 @@ define('DB_PASS', '');
 
 // ── Application Configuration ───────────────────────────────────────────────
 define('APP_URL',  'http://localhost/kensue2');  // No trailing slash
-define('APP_NAME', 'Kensue');
+define('APP_NAME', 'Altas');
 define('APP_ENV',  'development');            // 'development' | 'production'
 
 // ── Error display ────────────────────────────────────────────────────────────

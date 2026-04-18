@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MIDNIGHT RESET CRON
  * Crontab: 0 0 * * * /usr/bin/php /var/www/html/mlm/cron/midnight_reset.php
@@ -17,8 +18,8 @@ define('DB_PORT', '3306');
 define('DB_NAME', 'kensue_db');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('APP_URL',  '');
-define('APP_NAME', 'MLM');
+define('APP_URL',  'http://localhost/kensue2');
+define('APP_NAME', 'Kensue');
 define('APP_ENV',  'production');
 
 require_once __DIR__ . '/../config/db.php';
@@ -36,7 +37,6 @@ try {
         ->execute([$ts]);
 
     echo "[{$ts}] Midnight reset complete. Members reset: {$affected}\n";
-
 } catch (\Exception $e) {
     echo "[{$ts}] ERROR: " . $e->getMessage() . "\n";
     exit(1);
